@@ -17,6 +17,7 @@ COPY . .
 RUN npx prisma generate
 
 # Build the TypeScript code
+RUN npm install -g typescript
 RUN npm run build
 
 # Production stage
