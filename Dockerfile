@@ -8,7 +8,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies, including Prisma CLI
-RUN npm install --production=false
+RUN npm install
+
+# Install Prisma CLI globally
+RUN npm install -g prisma
 
 # Copy the application files
 COPY . .
@@ -26,16 +29,11 @@ FROM node:18-alpine AS final
 # Set the working directory
 WORKDIR /app
 
-# Copy only necessary files from base stage
-COPY --from=base /app/package*.json ./  
-COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/dist ./dist
-
-# Install only production dependencies
-RUN npm install --production
+# Copy built files and dependencies from base stage
+COPY --from=base /app ./
 
 # Expose the port that the application will run on
-EXPOSE 3000
+EXPOSE 4000
 
 # Command to run your app
 CMD ["node", "dist/main.js"]
