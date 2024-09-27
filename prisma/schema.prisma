@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  displayName String
+  email       String   @unique
+  phoneNumber String? // For SMS-based authentication
+  password    String
+  mfaEnabled  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  mfaMethods     MFA[] // One-to-many relationship with MFA methods
+  backupCodes    BackupCode[]
+  BiometricToken BiometricToken[]
+}
+
+model MFA {
+  id        String   @id @default(uuid())
+  type      MFAType // Enum (SMS, Authenticator, Hardware Key, etc.)
+  isEnabled Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // For OTP-based methods (SMS, Authenticator App)
+  otpCode OTPCode?
+
+  // For hardware key and platform-specific methods
+  hardwareKey String? // Public key or identifier for FIDO2/U2F
+
+  // For biometric and platform-specific MFA
+  biometricToken String? // For storing biometric information or tokens
+}
+
+model OTPCode {
+  id        String   @id @default(uuid())
+  code      String
+  expiresAt DateTime // Expiration time for the OTP
+  mfa       MFA      @relation(fields: [mfaId], references: [id])
+  mfaId     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model BackupCode {
+  id        String   @id @default(uuid())
+  code      String
+  used      Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+model BiometricToken {
+  id        String   @id @default(uuid())
+  token     String // Token representing biometric data
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MFAType {
+  SMS
+  AUTHENTICATOR_APP
+  HARDWARE_KEY
+  BIOMETRIC
+  PUSH_NOTIFICATION
+  EMAIL
+}
