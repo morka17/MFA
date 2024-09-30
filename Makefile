@@ -14,7 +14,13 @@ migrate-down:
 	npx prisma migrate reset --force --skip-seed
 
 ts-init: 
-	
+	npx tsc init 
+
+docker-build:
+	docker build  -t nodejs-mfa-api . --privileged
+
+docker-run: 
+	docker run --privileged -p 3000:3000 nodejs-mfa-api
 
 # Clean target (optional, for cleaning generated files if needed)
 clean:
