@@ -1,10 +1,11 @@
 import { makeExecutableSchema } from "@graphql-tools/schema";
+import AuthTypeDefs from "../features/authentications/email_based/email.schema";
 
 
 
 
 
-const typeDefs: any[] = []
+const typeDefs: any[] = [AuthTypeDefs]
 const resolvers: any[] = []
 
 
