@@ -1,12 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nodejs-mfa-api-service
+  name: nodejs-mfa
 spec:
   selector:
-    app: nodejs-mfa-api
+    app: nodejs-mfa
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3000
-  type: LoadBalancer
+  - port: 80
+    targetPort: 3000
