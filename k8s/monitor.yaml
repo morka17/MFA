@@ -1,0 +1,11 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nodejs-mfa-monitor
+spec:
+  selector:
+    matchLabels:
+      app: nodejs-mfa
+  endpoints:
+  - port: 3000
+    path: /metrics

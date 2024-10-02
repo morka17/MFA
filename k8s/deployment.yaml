@@ -14,10 +14,20 @@ spec:
       containers:
       - name: nodejs-mfa
         image: mfa:latest
+        ports:
+        - containerPort: 3000
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
-        ports:
-        - containerPort: 3000
+        # Expose the metrics endpoint for Prometheus scraping
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 3000
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 3000
         imagePullPolicy: Never
+        
