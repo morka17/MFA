@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: nodejs-mfa
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: nodejs-mfa
@@ -13,21 +14,27 @@ spec:
     spec:
       containers:
       - name: nodejs-mfa
-        image: mfa:latest
+        image: morka17/mfa:latest
         ports:
         - containerPort: 3000
         resources:
-          limits:
+          requests:
             memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
             cpu: "500m"
-        # Expose the metrics endpoint for Prometheus scraping
-        livenessProbe:
-          httpGet:
-            path: /metrics
-            port: 3000
-        readinessProbe:
-          httpGet:
-            path: /metrics
-            port: 3000
-        imagePullPolicy: Never
-        
+        imagePullPolicy: Always
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nodejs-mfa-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nodejs-mfa
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50

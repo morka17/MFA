@@ -1,10 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nodejs-mfa
+  name: nodejs-mfa-service
 spec:
   selector:
     app: nodejs-mfa
   ports:
-  - port: 80
-    targetPort: 3000
+    - protocol: TCP
+      port: 80         # Exposed service port
+      targetPort: 3000  # Container's port
+  type: LoadBalancer   # Change service type to LoadBalancer
