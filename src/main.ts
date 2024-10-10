@@ -11,6 +11,7 @@ import schema from "./utils/schema";
 import prismaClient from "./utils/prisma";
 import { MyContext, User } from "./utils/context";
 import { jwtDecode } from "./utils/jwt";
+import * as client from 'prom-client';
 
 
 
@@ -22,6 +23,10 @@ const httpServer = createServer(app)
 
 app.use(cookieParser())
 
+
+// Create a new registry
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
 
 // WebSocket server for subscriptions
 const wsServer = new WebSocketServer({
@@ -96,6 +101,11 @@ async function main() {
         res.status(200).json({ status: 'ok' });
     });
 
+    // Expose the metrics at the /metrics endpoint
+    app.get('/metrics', async (req, res) => {
+        res.set('Content-Type', register.contentType);
+        res.end(await register.metrics());
+    });
 
 
     httpServer.listen(3000, () => {
