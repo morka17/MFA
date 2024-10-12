@@ -12,7 +12,7 @@ import prismaClient from "./utils/prisma";
 import { MyContext, User } from "./utils/context";
 import { jwtDecode } from "./utils/jwt";
 import * as client from 'prom-client';
-
+import logger from "./utils/logger";
 
 
 
@@ -24,9 +24,13 @@ const httpServer = createServer(app)
 app.use(cookieParser())
 
 
+
+
 // Create a new registry
 const register = new client.Registry();
 client.collectDefaultMetrics({ register });
+
+
 
 // WebSocket server for subscriptions
 const wsServer = new WebSocketServer({
@@ -98,6 +102,7 @@ async function main() {
     // app.use("/v1/api/payment", bodyParser.json(), paymentRouter)
     // Health check route
     app.get('/v1/api/health', (req, res) => {
+        logger.info({ req, message: 'Checking system\'s health' });
         res.status(200).json({ status: 'ok' });
     });
 

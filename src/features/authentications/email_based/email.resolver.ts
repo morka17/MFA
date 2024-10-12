@@ -1,5 +1,6 @@
 import { GraphQLError } from "graphql/error"
 import { MyContext } from "../../../utils/context";
+import logger from "../../../utils/logger";
 
 
 
@@ -7,7 +8,9 @@ import { MyContext } from "../../../utils/context";
 const AuthenticatonResolvers = {
 
     Query: {
-        currentUser: (_parent: any, _: any, context: MyContext) => {
+        currentUser: (_parent: any, args: any, context: MyContext) => {
+            logger.info({args, message: "Fetching user data"})
+
             const { user } = context
             return user
         }
@@ -17,6 +20,7 @@ const AuthenticatonResolvers = {
     Mutation: {
         // signup(input: SignupInput!): Response!
         signup: async (_parent: any, args: SignupInput, context: MyContext): Promise<any> => {
+            logger.info({args, message: "Creating user account"})
 
             let data = {
                 ...args.input,
